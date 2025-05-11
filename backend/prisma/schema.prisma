@@ -1,0 +1,38 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:1234567890@172.17.0.2:5432/postgres?schema=public"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  name     String?
+  password String
+  ratings  Rating[] @relation("UserRatings")
+}
+
+model Product {
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String
+  fullDescription String?
+  image           String?
+  ratings         Rating[]
+}
+
+
+model Rating {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  productId Int
+  value     Int
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User    @relation("UserRatings", fields: [userId], references: [id])
+
+  @@unique([userId, productId])  // Уникальный составной индекс
+}
