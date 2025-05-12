@@ -7,7 +7,7 @@ WORKDIR /app
 # Установка аргумента сборки для DATABASE_URL
 #ARG DATABASE_URL
 #ENV DATABASE_URL=${DATABASE_URL}
-ENV DATABASE_URL='postgresql://postgres:1234567890@172.17.0.2:5432/postgres?schema=public'
+#ENV DATABASE_URL='postgresql://postgres:1234567890@database:5432/postgres?schema=public'
 
 # Установка OpenSSL, Bash и curl
 #RUN apk add --no-cache openssl bash curl
@@ -56,8 +56,9 @@ ENV NODE_ENV=production
 
 # Открытие порта
 EXPOSE 3001
-ENTRYPOINT ["node", "dist/main.js"]
+#ENTRYPOINT ["node", "dist/main.js"]
 
+CMD sh -c "npx prisma migrate deploy && node dist/main.js"
 
 # Команда запуска приложения, ожидаем доступность базы данных
 #CMD ["/usr/local/bin/wait-for-it", "db:5432", "--", "npm", "run", "start:dev"]

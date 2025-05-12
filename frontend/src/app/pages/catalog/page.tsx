@@ -10,7 +10,7 @@ import { ModalWindowAddPost } from "@/app/pages/catalog/modal/ModalWindowAddPost
 const Page = () => {
     const [access, setAccess] = useState<boolean>(false);
     const [catalog, setCatalog] = useState<{
-        id: string,
+        id: any,
         name: string,
         description: string,
         image?: string,
@@ -19,7 +19,7 @@ const Page = () => {
     }[]>([]);
     const [opened, setOpened] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<{
-        id: string,
+        id: any,
         name: string,
         description: string,
         image?: string,
