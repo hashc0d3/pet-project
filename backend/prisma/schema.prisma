@@ -1,10 +1,16 @@
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:1234567890@database:5432/postgres?schema=public"
+  url      = "postgresql://postgres:1234567890@localhost:5432/postgres?schema=public"
 }
 
 generator client {
   provider = "prisma-client-js"
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
 }
 
 model User {
@@ -12,8 +18,10 @@ model User {
   email    String   @unique
   name     String?
   password String
+  role     Role     @default(USER)
   ratings  Rating[] @relation("UserRatings")
 }
+
 
 model Product {
   id              Int      @id @default(autoincrement())

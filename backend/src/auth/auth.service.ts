@@ -1,25 +1,33 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(private usersService: UsersService, private jwtService: JwtService) {}
 
-    // Метод для проверки пароля при логине
-    async validateUser(email: string, password: string) {
-        const user = await this.prisma.user.findUnique({
-            where: { email },
-        });
-
-        if (!user) {
-            throw new Error('Неверный email или пароль');
+    async validateUser(email: string, pass: string) {
+        const user = await this.usersService.findByEmail(email);
+        if (user && await bcrypt.compare(pass, user.password)) {
+            const { password, ...result } = user;
+            return result;
         }
+        throw new UnauthorizedException('Неверные учетные данные');
+    }
 
-        // Проверяем пароль в открытом виде
-        if (user.password !== password) {
-            throw new Error('Неверный email или пароль');
-        }
+    async generateToken(userData: any) {
+        return this.jwtService.sign({ sub: userData.id, role: userData.role });
+    }
 
-        return user;
+    async validateToken(token: string) {
+        return this.jwtService.verify(token);
+    }
+
+    checkPermissions(user: any, action: string): boolean {
+        // Пример: user.role = 'admin' разрешено всё
+        if (user.role === 'admin') return true;
+        // Дополнительная проверка
+        return false;
     }
 }
